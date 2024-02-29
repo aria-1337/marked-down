@@ -1,10 +1,16 @@
 import React from "react";
+import styled from 'styled-components';
+import Header from './components/Header.jsx';
 
 export default function App() {
   return (
-    <div>
-      <h1>💖 Hello World!</h1>
-      <p>Welcome to your Electron application.</p>
-    </div>
+    <Container>
+      <Header />
+    </Container>
   );
 }
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
