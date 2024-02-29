@@ -17,19 +17,23 @@ export default function Editor() {
     }, []);
 
     function selectLine(number) {
-        console.log(number);
         const oldState = lines;
         if (activeLine && number !== activeLine) { oldState[activeLine-1].active = false; }
         oldState[number-1].active = true;
-        console.log(oldState);
         setLines(oldState);
         setActiveLine(number);
+    }
+
+    function writeToLine(number, newContent) {
+        const oldState = lines;
+        oldState[number-1].content = newContent;
+        setLines(oldState);
     }
 
     return (
         <OuterContainer>
             <EditorContainer>
-                { lines.map((lineState, i) => <EditorLine key={i+1} lineState={lineState} selectLine={selectLine} />)}
+                { lines.map((lineState, i) => <EditorLine key={i+1} lineState={lineState} selectLine={selectLine} writeToLine={writeToLine} />)}
             </EditorContainer>
         </OuterContainer>
     );
@@ -50,11 +54,21 @@ const EditorContainer = styled.div`
     padding-left: 10px;
 `;
 
-function EditorLine({ lineState: { number, active, content }, selectLine }) {
+function EditorLine({ lineState: { number, active, content }, selectLine, writeToLine }) {
+    const [internalContent, setInternalContent] = useState(content);
+    function write(e) {
+        setInternalContent(e.target.value);
+    }
+
+    // When leaving line write to it
+    useEffect(() => {
+        writeToLine(number, internalContent);
+    }, [active]);
+
     return (
         <EditorLineContainer active={active.toString()} onClick={() => selectLine(number)}>
             { number }
-            <EditorLineContent value={content} />
+            <EditorLineContent value={internalContent} onChange={write}/>
         </EditorLineContainer>
     );
 }
