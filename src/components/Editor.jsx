@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { parse } from 'marked';
+
+
+const OuterContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+`;
 
 export default function Editor() {
     const [lines, setLines] = useState([]);
@@ -8,7 +17,7 @@ export default function Editor() {
     // Eventually this will load from saves or prior open file
     useEffect(() => {
         const l = [];
-        l.push({ number: 1, active: true, content: 'Example content' });
+        l.push({ number: 1, active: true, content: '' });
         for (let i = 1; i < 40; i++) {
             l.push({ number: i+1, active: false, content: '' });
         }
@@ -35,16 +44,10 @@ export default function Editor() {
             <EditorContainer>
                 { lines.map((lineState, i) => <EditorLine key={i+1} lineState={lineState} selectLine={selectLine} writeToLine={writeToLine} />)}
             </EditorContainer>
+            <Preview lines={lines} />
         </OuterContainer>
     );
 }
-
-const OuterContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100%;
-`;
 
 const EditorContainer = styled.div`
     width: 50%;
@@ -63,7 +66,7 @@ function EditorLine({ lineState: { number, active, content }, selectLine, writeT
     // When leaving line write to it
     useEffect(() => {
         writeToLine(number, internalContent);
-    }, [active]);
+    }, [internalContent]);
 
     return (
         <EditorLineContainer active={active.toString()} onClick={() => selectLine(number)}>
@@ -90,4 +93,25 @@ const EditorLineContainer = styled.div`
     color: ${props => props.active === 'true' ? 'white' : 'black' };
     background-color: ${props => props.active === 'true' ? '#94b8f2' : 'transparent'};
     padding: ${props => props.active === 'true' ? '4px 10px' : '0px' };
+`;
+
+function Preview({ lines }) {
+    console.log(lines);
+    return (
+        <PreviewContainer>
+            <div dangerouslySetInnerHTML={{__html:parse(
+                lines.reduce((acc, cv) => {
+                    acc += (cv.content + '\n');
+                    return acc;
+                }, '')
+            )}} />
+        </PreviewContainer>
+    );
+}
+
+const PreviewContainer = styled.div`
+    width: 50%;
+    height: 100%;
+    border-bottom: 5px solid #ebeae8;
+    padding-left: 10px;
 `;
