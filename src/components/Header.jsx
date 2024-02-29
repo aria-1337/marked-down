@@ -14,8 +14,8 @@ const Container = styled.div`
     flex-direction: row;
     padding: 5px 10px;
     align-items: center;
-    justify-content: space-between;
     background-color: #ebeae8;
+    justify-content: center;
 `;
 
 const Title = styled.h3`
